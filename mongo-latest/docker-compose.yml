@@ -1,0 +1,18 @@
+version: '3'
+services:
+  webserver-1:
+    image: rajmor/apache-php5:latest
+    container_name: webserver-1
+    hostname: webserver-1
+    restart: always
+    ports:
+      - "8000:80"
+    volumes:
+      - ./htdocs/webserver-1/html:/var/www/localhost/htdocs
+      - ./htdocs/webserver-1/logs:/var/log/apache2
+    networks:
+      - elastic
+
+networks:
+  elastic:
+    driver: bridge

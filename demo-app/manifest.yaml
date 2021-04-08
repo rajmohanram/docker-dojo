@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: blue-app
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: blue
+  template:
+    metadata:
+      labels:
+        app: blue
+    spec:
+      containers:
+      - name: app-container
+        image: rajmor/demo-app:latest
+        ports:
+        - containerPort: 5000
+          name: http
+        env:
+        - name: APP_NAME
+          value: 'BLUE'
+        - name: APP_VERSION
+          value: '1'
+        - name: APP_DATA
+          value: 'Data from blue application'
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: blue-app
+spec:
+  type: NodePort
+  selector:
+    app: blue
+  ports:
+  - name: http
+    port: 80
+    targetPort: http

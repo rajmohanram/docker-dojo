@@ -1,0 +1,89 @@
+
+Proxy server:
+-------------
+apk update && apk upgrade
+
+apk add prometheus-node-exporter
+rc-update add node-exporter boot
+service node-exporter restart
+
+vi /etc/hosts
+x.x.x.x	webserver-1
+
+
+apk add haproxy
+cd /etc/haproxy
+mv haproxy.cfg haproxy.cfg.orig
+vi haproxy.cfg
+rc-update add haproxy boot
+service haproxy restart
+
+
+
+Web server:
+--------------
+apk add docker docker-compose
+rc-update add docker boot
+service docker restart
+addgroup root docker
+
+apk add prometheus-node-exporter
+rc-update add node-exporter boot
+service node-exporter restart
+
+mkdir /opt/htdocs
+copy docker-compose.yml
+docker-compose up  -d
+
+apk add samba
+adduser -H -h /opt/htdocs -s /sbin/nologin webadmin
+smbpasswd -a webadmin
+smbpasswd -e webadmin
+cd /etc/samba/
+mv smb.conf smb.conf.orig
+vi smb.conf
+rc-update add samba boot
+service samba restart
+
+
+
+DB Server:
+----------
+apk add apache2 php7-apache2 phpmyadmin mariadb mariadb-client prometheus-node-exporter
+mysql_secure_installation
+rc-update add apache2 boot
+rc-update add mariadb boot
+rc-update add node-exporter boot
+
+service docker start
+service apache2 start
+service node-exporter start
+
+
+
+Monitoring server:
+------------------
+
+apk add docker docker-compose
+rc-update add docker boot
+service docker restart
+addgroup root docker
+
+apk add prometheus-node-exporter
+rc-update add node-exporter boot
+service node-exporter restart
+
+mkdir /opt/monitoring
+copy docker-compose.yml
+docker-compose up  -d
+configure prometheus & grafana
+
+
+https://grafana.com/grafana/dashboards/893
+node exporter stats
+
+
+
+
+
+

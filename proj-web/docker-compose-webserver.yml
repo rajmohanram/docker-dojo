@@ -1,0 +1,65 @@
+version: '3'
+services:
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    container_name: cadvisor
+    restart: always
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:rw
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    ports:
+    - 8080:8080
+    networks:
+      - web_net
+
+  default-site:
+    image: rajmor/apache-php7:latest
+    container_name: webserver
+    hostname: webserver
+    restart: always
+    ports:
+      - "8000:80"
+    volumes:
+      - ./default-site/html:/var/www/localhost/htdocs
+      - ./default-site/logs:/var/log/apache2
+    networks:
+      - web_net
+
+  webserver-1:
+    image: rajmor/apache-php5:latest
+    container_name: webserver-1
+    hostname: webserver-1
+    restart: always
+    ports:
+      - "8001:80"
+    volumes:
+      - ./site-1/html:/var/www/localhost/htdocs
+      - ./site-1/logs:/var/log/apache2
+    networks:
+      - web_net
+
+  webserver-2:
+    image: rajmor/apache-php7:latest
+    container_name: webserver-2
+    hostname: webserver-2
+    restart: always
+    ports:
+      - "8002:80"
+    volumes:
+      - ./site-2/html:/var/www/localhost/htdocs
+      - ./site-2/logs:/var/log/apache2
+    networks:
+      - web_net
+
+networks:
+  web_net:
+    name: web_network
+    driver: bridge
+    driver_opts:
+      com.docker.network.enable_ipv6: "false"
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.16.1.0/24
